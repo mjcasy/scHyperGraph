@@ -8,7 +8,7 @@ N <- 300
 G <- 1800
 Trials <- 100
 
-Results <- matrix(nrow = 3*Trials, ncol = 3)
+Results <- matrix(nrow = 3*Trials, ncol = 2)
 
 set.seed(1)
 k <- 1
@@ -23,31 +23,17 @@ for(i in 1:Trials){
       CountsMatrix <- Three_Clusters(N, G)
     }
     
-    Results[k,3] <- j
+    Results[k,2] <- j
     
     py_run_file("./HyperEigen.py")
     Results[k,1] <- as.numeric(py$large_val)
     
-    tCounts <- apply(CountsMatrix, 2, function(x) x / sum(x))
-    CountsMatrix <- asSparseMatrix(tCounts)
-    
-    py_run_file("./HyperEigen.py")
-    Results[k,2] <- as.numeric(py$large_val)
     k <- k+1
   }
 }
 
-# save(Results, file = "GamPoiSim")
-# load("GamPoiSim")
-tapply(Results[,1], Results[,3], mean)
-tapply(Results[,1], Results[,3], sd)
 
-tapply(Results[,2], Results[,3], mean)
-tapply(Results[,2], Results[,3], sd)
+tapply(Results[,1], Results[,2], mean)
 
-plot(Results[,3], Results[,1])
-plot(Results[,3], Results[,2])
-  
-cor.test(Results[,3], Results[,1], "two.sided", "spearman", exact = FALSE)
-cor.test(Results[,3], Results[,2], "two.sided", "spearman", exact = FALSE)
+cor.test(Results[,2], Results[,1], "two.sided", "spearman", exact = FALSE)
 

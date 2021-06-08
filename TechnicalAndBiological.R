@@ -1,25 +1,19 @@
 
 library(Matrix)
 library(reticulate)
+source("./Path2Data.R")
 
 DataSets <- list(Path2Svensson, Path2Tian, Path2Stumpf)
 
-Results <- matrix(NA, nrow = length(DataSets), ncol = 2)
-dimnames(Results) <- list(c("Svensson", "Tian", "Stumpf"), c("Model 1", "Model 2"))
+Results <- vector(length = length(DataSets))
+names(Results) <- c("Svensson", "Tian", "Stumpf")
 
-for(i in 1:nrow(Results)){
-  for(j in 1:ncol(Results)){
-    load(DataSets[[i]])
-    CountsMatrix <- t(CountsMatrix)
-    
-    if (j == 2){
-      CountsMatrix <- t(t(CountsMatrix) / colSums(CountsMatrix))
-    }
+for(i in 1:length(Results)){
+  load(DataSets[[i]])
+  CountsMatrix <- t(CountsMatrix)
+  
+  py_run_file("./HyperEigen.py")
 
-    py_run_file("./HyperEigen.py")
-
-    Results[i,j] <- signif(as.numeric(py$large_val), 3)
-    rm(CountsMatrix)
-    print(Sys.time())
-  }
+  Results[i] <- as.numeric(py$large_val)
+  rm(CountsMatrix)
 }
